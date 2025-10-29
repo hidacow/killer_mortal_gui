@@ -18,6 +18,8 @@ const i18next_data = {
                 "toggle-hands": "Toggle show hands",
                 "toggle-mortal-advice": "Toggle Mortal advice",
                 "toggle-dealin-rate" : "Toggle dealin rate display<br><br>(Not output by Mortal, simple heuristics for riichi only)",
+                "toggle-error-threshold" : "Set error threshold",
+                "error-threshold-prompt" : "Set error threshold [100-0]. 100 = show all errors, 25 = show only large errors. Currently: {{current}}",
                 "options-label": "Options",
                 "options": "Options",
                 "langLabel": "Language",
@@ -26,7 +28,7 @@ const i18next_data = {
                     "Mortal's opinions shown with green bars",
                     "Top choice always 100% height",
                     "Others relative to the top choice",
-                    "User's choice shown with a yellow bar",
+                    "User's choice outlined in red",
                     "Click on discard bars to toggle spoiler-free WWYD mode",
                     "Click on round indicator to show score table",
                     "Click on a row in the table to skip to that round",
@@ -40,6 +42,7 @@ const i18next_data = {
                     ['<code>m</code>', 'Toggle Mortal advice'],
                     ['<code>h</code>', 'Toggle show hands'],
                     ['<code>b</code>', 'Bookmark current position in URL'],
+                    ['<code>e</code>', 'Set Error threshold <code>100*P(user)/P(mortal)<code>'],
                     ['<code>?</code>', 'Show about'],
                     ['', 'Optional extra features:'
                         + '<br>The following are not output by Mortal.'
@@ -250,6 +253,8 @@ const i18next_data = {
                 "toggle-hands": "开关别家手牌",
                 "toggle-mortal-advice": "开关 Mortal 提示",
                 "toggle-dealin-rate" : "开关铳率条<br><br>（非 Mortal 输出，仅针对立直家，使用简单启发式算法）",
+                "toggle-error-threshold" : "设置错误阈值",
+                "error-threshold-prompt" : "设置错误阈值 [100-0]。100 = 显示所有错误，25 = 只显示重大错误。当前值：{{current}}",
                 "options-label": "选项",
                 "options": "选项",
                 "langLabel": "语言",
@@ -258,7 +263,7 @@ const i18next_data = {
                     "Mortal 切牌选择显示为绿条。",
                     "第一切牌选择固定为 100% 高度。",
                     "其他切牌选择为相对高度。",
-                    "玩家切牌选择显示为黄条。",
+                    "玩家的选择用红框框出。",
                     "点击手牌区域，切换无提示何切模式。",
                     "点击局数指示器，显示得点表。",
                     "点击得点表任意一行，可跳转至该小局。",
@@ -272,15 +277,16 @@ const i18next_data = {
                     ['<code>m</code>', '开关 Mortal 提示'],
                     ['<code>h</code>', '开关别家手牌'],
                     ['<code>b</code>', '将当前局面表示在网址中，方便以后访问'],
+                    ['<code>e</code>', '设置错误阈值 <code>100*P(玩家)/P(mortal)<code>'],
                     ['<code>?</code>', '显示关于窗口'],
                     ['', '可选的额外功能：'
                         + '<br>以下内容不是 Mortal 的输出。'
                         + '<br>仅使用了简单的启发式算法，仅针对立直家。'
                         + '<br>按 <code>d</code> 键启用。'
                     ],
-                  ['<code>d</code>', '开关铳率条'],
-                  ['<code>a</code>', '显示累积铳率'],
-                  ['<code>z</code>', '显示详细铳率'],
+                    ['<code>d</code>', '开关铳率条'],
+                    ['<code>a</code>', '显示累积铳率'],
+                    ['<code>z</code>', '显示详细铳率'],
                 ],
                 'Engine'                : 'AI 引擎'                ,
                 'Model tag'             : '模型版本'               ,
@@ -475,6 +481,8 @@ const i18next_data = {
                 "toggle-hands": "타가 손패 보기",
                 "toggle-mortal-advice": "모탈 확률 보기",
                 "toggle-dealin-rate" : "Toggle dealin rate display<br><br>(Not output by Mortal, simple heuristics for riichi only)",
+                "toggle-error-threshold" : "Set error threshold",
+                "error-threshold-prompt" : "Set error threshold [100-0]. 100 = show all errors, 25 = show only large errors. Currently: {{current}}",
                 "options-label": "설정",
                 "options": "설정",
                 "langLabel": "언어",
@@ -483,7 +491,7 @@ const i18next_data = {
                     "모탈의 선택 확률은 초록색 막대로 표시됩니다.",
                     "가장 확률이 높은 선택지가 항상 100%의 높이를 가지고,",
                     "다른 선택지는 비례해서 높이를 계산합니다.",
-                    "작사의 실제 선택은 노란색 막대로 표시됩니다.",
+                    "User's choice outlined in red",
                     "확률 막대를 클릭하면 모탈의 선택 확률을 숨길 수 있습니다.",
                     "화면 중앙의 대국 표시를 클릭하면 점수표를 볼 수 있습니다.",
                     "점수표에서 특정 대국을 클릭하면 그 대국으로 이동할 수 있습니다.",
@@ -497,6 +505,7 @@ const i18next_data = {
                     ['<code>m</code>', 'Toggle Mortal advice'],
                     ['<code>h</code>', 'Toggle show hands'],
                     ['<code>b</code>', 'Bookmark current position in URL'],
+                    ['<code>e</code>', 'Set Error threshold <code>100*P(user)/P(mortal)<code>'],
                     ['<code>?</code>', 'Show about'],
                     ['', 'Optional extra features:'
                         + '<br>The following are not output by Mortal.'
@@ -721,6 +730,8 @@ const i18next_data = {
                 "toggle-hands": "相手の手牌を表示/非表示",
                 "toggle-mortal-advice": "Mortalのアドバイスを表示/非表示",
                 "toggle-dealin-rate" : "放銃率を表示/非表示<br><br>(Mortalによる出力ではなく、単純なヒューリスティックのみ)",
+                "toggle-error-threshold" : "Set error threshold",
+                "error-threshold-prompt" : "Set error threshold [100-0]. 100 = show all errors, 25 = show only large errors. Currently: {{current}}",
                 "options-label": "設定",
                 "options": "設定",
                 "langLabel": "言語",
@@ -729,7 +740,7 @@ const i18next_data = {
                     "Mortalの意見は、緑のバーで表示されます",
                     "トップの選択肢は常に100%の高さです",
                     "他の選択肢は、トップの選択肢に対する相対値です",
-                    "ユーザーの選択は、黄色のバーで表示されます",
+                    "User's choice outlined in red",
                     "捨て牌のバーをクリックすると、バーの表示・非表示を切り替えます",
                     "真ん中の局数をクリックすると、スコア表を表示します",
                     "スコア表の行をクリックすると、その局にジャンプします",
@@ -743,15 +754,16 @@ const i18next_data = {
                     ['<code>m</code>', 'Mortalのアドバイスを表示/非表示'],
                     ['<code>h</code>', '相手の手牌を表示/非表示'],
                     ['<code>b</code>', '現在の局面をURLに反映'],
+                    ['<code>e</code>', 'Set Error threshold <code>100*P(user)/P(mortal)<code>'],
                     ['<code>?</code>', 'ヘルプを表示'],
-                    ['', 'Optional extra features:'
-                        + '<br>The following are not output by Mortal.'
-                        + '<br>Simple heuristics for riichi only.'
-                        + '<br>Enable with <code>d</code>.'
+                    ['', 'オプションの追加機能:'
+                        + '<br>これらの機能はMortalによる出力ではありません。'
+                        + '<br>リーチだけが対象の単純なヒューリスティクスです'
+                        + '<br><code>d</code> で有効化します。'
                     ],
-                    ['<code>d</code>', '放銃率を表示/非表示<br><br>(Mortalによる出力ではなく、単純なヒューリスティックのみ)'],
-                    ['<code>a</code>', 'Show accumulated dealin rate'],
-                    ['<code>z</code>', 'Show detailed dealin rate'],
+                    ['<code>d</code>', '放銃率を表示/非表示<br><br>(Mortalによる出力ではなく、単純なヒューリスティクスのみ)'],
+                    ['<code>a</code>', '累積放銃率を表示'],
+                    ['<code>z</code>', '詳細放銃率を表示'],
                 ],
                 'Engine'                : 'エンジン'                     ,
                 'Model tag'             : 'モデルタグ'                   ,
@@ -785,24 +797,24 @@ const i18next_data = {
                 "6z":"$t(G)",
                 "7z":"$t(R)",
                 "spoiler": "(ネタバレ注意: Mortalの意見は非表示。クリックで表示)",
-                "dealin-riichi-only": "Dealin rate: No opponents have called Riichi",
-                "dealin-rate": "Dealin Rate",
-                "accum-dealin-rate": "Accumulated Dealin Rate",
-                "Pusher": "Pusher",
-                "Tenpai": "Tenpai",
-                "Tile": "Tile",
-                "This %": "This %",
-                "Total %": "Total %",
-                "Details": "Details",
-                "hit": "hit", // Tenpai player drew and won
-                "miss": "miss", // Tenpai player's draw was not 
-                "sujis-tested": "Sujis tested",
-                "suji-dealin-rate": "Suji dealin rate",
-                "Tile dealin rates": "Tile dealin rates",
-                "waitTypeStr": ['Ryanmen', 'Kanchan', 'Penchan', 'Tanki', 'Shanpon'],
-                "Wait type": "Wait type",
-                "Tiles": "Tiles",
-                "Left": "Left",
+                "dealin-riichi-only": "放銃率: 誰もリーチしていません",
+                "dealin-rate": "放銃率",
+                "accum-dealin-rate": "累積放銃率",
+                "Pusher": "打牌者",
+                "Tenpai": "テンパイ",
+                "Tile": "牌",
+                "This %": "単体%",
+                "Total %": "合計%",
+                "Details": "詳細",
+                "hit": "ツモ", // Tenpai player drew and won
+                "miss": "ツモれず", // Tenpai player's draw was not 
+                "sujis-tested": "通ったスジ",
+                "suji-dealin-rate": "スジ放銃率",
+                "Tile dealin rates": "牌別放銃率",
+                "waitTypeStr": ['リャンメン', 'カンチャン', 'ペンチャン', '単騎', 'シャンポン'],
+                "Wait type": "待ち種",
+                "Tiles": "牌",
+                "Left": "残り",
                 // Advice words
                 'dahai'   : '打',
                 'pon'     : 'ポン',
@@ -819,14 +831,14 @@ const i18next_data = {
                 'ankan'   : 'カン',
                 'daiminkan' : 'カン',
                 'kakan'   : 'カン',
-                'Action'  : 'Action',
+                'Action'  : '選択',
                 'Q'       : 'Q',
                 'P'       : 'P',
-                'Player'  : 'Player',
+                'Player'  : 'プレイヤー',
                 'Mortal'  : 'Mortal',
                 // Results
                 "Final"   : "最終結果", // 
-                "Final Result:"   : "Final Result:", // Final result in accum-dealin-rate table
+                "Final Result:"   : "最終結果:", // Final result in accum-dealin-rate table
                 "Round"   : "局",
                 "Ron"     : "ロン",
                 "win-by"  : "{{winner}} {{type}}",
@@ -952,6 +964,8 @@ const i18next_data = {
                 "toggle-hands": "Показать руки",
                 "toggle-mortal-advice": "Показать советы Mortal",
                 "toggle-dealin-rate" : "Показать вероятность наброса<br><br>(Оценка не от Mortal, простая эвристика только для риичи сценария)",
+                "toggle-error-threshold" : "Set error threshold",
+                "error-threshold-prompt" : "Set error threshold [100-0]. 100 = show all errors, 25 = show only large errors. Currently: {{current}}",
                 "options-label": "Настройки",
                 "options": "Настройки",
                 "langLabel": "Язык",
@@ -960,7 +974,7 @@ const i18next_data = {
                     "Выбор Mortal обозначется зелеными полосками",
                     "Лучший выбор всегда самая высокая полоска",
                     "Прочие выборы отображаются через относительную высоту полоски",
-                    "Пользовательский выбор обозначется желтой полоской",
+                    "User's choice outlined in red",
                     "Кликните на полоски, чтобы скрыть/отобразить подсказки от Mortal",
                     "Кликните на индикатор раунда, чтобы открыть таблицу очков",
                     "Кликните на строчку в таблице, чтобы переключится на выбранный раунд",
@@ -974,6 +988,7 @@ const i18next_data = {
                     ['<code>m</code>', 'Показать советы Mortal'],
                     ['<code>h</code>', 'Включить показ рук'],
                     ['<code>b</code>', 'Добавить текущее положение в URL'],
+                    ['<code>e</code>', 'Set Error threshold <code>100*P(user)/P(mortal)<code>'],
                     ['<code>?</code>', 'Открыть "О приложении"'],
                     ['', 'Дополнительные возможности:'
                         + '<br>Следующее - это не оценка Mortal.'
