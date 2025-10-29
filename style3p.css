@@ -99,10 +99,10 @@ h1{
 .grid-main{
     flex-shrink: 0;
     display: grid;
-    width:calc(var(--zoom) * 695px);
-    height:calc(var(--zoom) * 775px);
-    grid-template-columns: calc(90/695*100%) calc(135/695*100%) calc(205/695*100%) calc(135/695*100%) calc(90/695*100%);
-    grid-template-rows: calc(90/775*100%) calc(135/775*100%) calc(205/775*100%) calc(135/775*100%) calc((90 + 70)/775*100%);
+    width:calc(var(--zoom) * 800px);
+    height:calc(var(--zoom) * 880px);
+    grid-template-columns: calc(100/800*100%) calc(165/800*100%) calc(230/800*100%) calc(165/800*100%) calc(100/800*100%);
+    grid-template-rows: calc(100/880*100%) calc(165/880*100%) calc(230/880*100%) calc(165/880*100%) calc((100 + 70)/880*100%);
     grid-template-areas: "ah-p2 ah-p2 ah-p2   ah-p2 ah-p1"
                          "ah-p3     . ad-p2   .     ah-p1"
                          "ah-p3 ad-p3 a-info  ad-p1 ah-p1"
@@ -168,6 +168,9 @@ h1{
     box-shadow: inset 0 0 calc(var(--zoom-tiles)*2px) black;
     padding: 2px; /* TODO: zoom this also, would simplify everything else! */
     border-radius: calc(var(--zoom-tiles)*4px);
+}
+.tileImgHighlight {
+    box-shadow: inset 0 0 0 calc(var(--zoom-tiles)*3px) hsl(0, 70%, 50%);
 }
 .tsumogiri {
     background:var(--color-tsumogiri);

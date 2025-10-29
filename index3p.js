@@ -363,7 +363,7 @@ class UI {
         let svgElement = callBars.firstElementChild
         let slot = 0
         for (let [idx, detail] of mortalEval.details.entries()) {
-            let Pval = detail.normProb*100
+            let Pval = detail.softNormProb*100
             let mortalDetail = !mortalEval.is_equal && idx==0
             if (detail.action.type == 'dahai' && !mortalDetail) {
                 continue // Skip tiles (unless it's a mismatch)
@@ -372,11 +372,6 @@ class UI {
                 continue // Not enough room in GUI to show more
             }
             let xloc = GS.C_db_tileWidth*GS.C_cb_widthFactor/2 + slot*GS.C_db_tileWidth*GS.C_cb_widthFactor
-            if (mortalEval.actual_index == idx) {
-                svgElement.appendChild(createRect(
-                    xloc-GS.C_db_heroBarWidth/2, GS.C_db_heroBarWidth, GS.C_cb_heroBarHeight, 1, GS.C_colorBarHero
-                ))
-            }
             svgElement.appendChild(createRect(
                 xloc-GS.C_db_mortBarWidth/2, GS.C_db_mortBarWidth, GS.C_cb_heroBarHeight, Pval/100*GS.C_cb_mortBarHeightRatio, GS.C_colorBarMortal
             ))
@@ -384,7 +379,21 @@ class UI {
             if (detail.action.type == 'hora' && detail.action.actor != detail.action.target) {
                 textContent = i18next.t('ron') // translate defaults to Tsumo. Change to Ron in this case
             }
-            svgElement.appendChild(createSvgText(xloc-GS.C_db_mortBarWidth/2-10, GS.C_db_height + 20, textContent))
+            let textElem = createSvgText(xloc-GS.C_db_mortBarWidth/2-10, GS.C_db_height + 20, textContent)
+            svgElement.appendChild(textElem)
+            if (mortalEval.actual_index == idx) {
+                let bbox = textElem.getBBox()
+                let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect")
+                rect.setAttribute("x", bbox.x - 3)
+                rect.setAttribute("y", bbox.y - 3)
+                rect.setAttribute("width", bbox.width + 6)
+                rect.setAttribute("height", bbox.height + 6)
+                rect.setAttribute("fill", "none")
+                rect.setAttribute("stroke", "hsl(0, 70%, 50%)")
+                rect.setAttribute("stroke-width", "2")
+                svgElement.insertBefore(rect, textElem)
+            }
+
             // Some kans include pai, some don't.
             let pai = detail.action.type.endsWith('kan') ? detail.action.consumed[0] : detail.action.pai
             if (pai) {
@@ -403,7 +412,7 @@ class UI {
         }
         if (!mortalEval.is_equal) {
             let xloc = GS.C_db_tileWidth*GS.C_cb_widthFactor/5 + slot*GS.C_db_tileWidth*GS.C_cb_widthFactor
-            let textContent = (mortalEval.details[mortalEval.actual_index].normProb > .50) ? i18next.t("Hmm...") : i18next.t("Clack!")
+            let textContent = (mortalEval.details[mortalEval.actual_index].normProb > .25) ? i18next.t("Hmm...") : i18next.t("Clack!")
             svgElement.appendChild(createSvgText(xloc-GS.C_db_mortBarWidth/2, 60, textContent))
         }
     }
@@ -458,11 +467,14 @@ class UI {
                 // TODO: Check code for this. For now assume due to illegal calls swaps
                 if (matchingDetailIdx != -1) {
                     let matchingDetail = mortalEval.details[matchingDetailIdx]
-                    let Pval = matchingDetail.normProb*100
+                    let Pval = matchingDetail.softNormProb*100
                     if (matchingDetailIdx == mortalEval.actual_index) {
-                        discardSvgElem.appendChild(createRect(
-                            xloc-GS.C_db_heroBarWidth/2, GS.C_db_heroBarWidth, GS.C_db_height, 1, GS.C_colorBarHero
-                        ))
+                        let tileDivs = this.hands[GS.heroPidx].querySelectorAll('div')
+                        if (i==-1) {
+                            tileDivs[tileDivs.length-1].lastChild.classList.add('tileImgHighlight')
+                        } else {
+                            tileDivs[i].lastChild.classList.add('tileImgHighlight')
+                        }
                     }
                     discardSvgElem.appendChild(createRect(
                         xloc-GS.C_db_mortBarWidth/2, GS.C_db_mortBarWidth, GS.C_db_height, Pval/100*GS.C_cb_mortBarHeightRatio, GS.C_colorBarMortal
@@ -1240,7 +1252,7 @@ function incrementalCalcDangerHelper(event, prevEvent, gs) {
     }
     if (event.type == 'tsumo') { // draw
         gs.unseenTiles[event.actor][normRedFive(event.pai)]--
-    } else if (['chi', 'pon', 'daiminikan', 'ankan'].includes(event.type)) {
+    } else if (['chi', 'pon', 'daiminkan', 'ankan'].includes(event.type)) {
         // the other players will see the consumed tiles
         for (let tile of event.consumed) {
             weseeitnow(gs, normRedFive(tile), event.actor)
@@ -1635,7 +1647,7 @@ function decRoundCounter() {
 
 function stopCondition(onlyMismatches) {
     let mortalEval = GS.ge[GS.hand_counter][GS.ply_counter].mortalEval
-    let mismatch = mortalEval && !mortalEval.is_equal
+    let mismatch = mortalEval && !mortalEval.is_equal && (mortalEval.details[mortalEval.actual_index].normProb < GS.errorThreshold)
     return mortalEval && (!onlyMismatches || mismatch) ||
         GS.ply_counter == GS.ge[GS.hand_counter].length-1
 }
@@ -1657,6 +1669,19 @@ function toggleDealinRate() {
     localStorage.setItem("showDealinRate", GS.showDealinRate ? 1 : 0)
     updateState()
 }
+function toggleErrorThreshold() {
+    let saveET = GS.errorThreshold*100
+    GS.errorThreshold = prompt(i18next.t("error-threshold-prompt", {current:`${(GS.errorThreshold*100).toFixed(0)}`}))
+    if (GS.errorThreshold == null) {
+        GS.errorThreshold = saveET
+    }
+    GS.errorThreshold = Number(GS.errorThreshold)
+    if (isNaN(GS.errorThreshold) || GS.errorThreshold < 0 || GS.errorThreshold > 100) {
+        GS.errorThreshold = saveET
+    }
+    GS.errorThreshold = GS.errorThreshold / 100
+    localStorage.setItem("errorThreshold", GS.errorThreshold)
+}
 function connectUI() {
     // first part might run more than once when people change language
     document.title = i18next.t("title")
@@ -1672,6 +1697,7 @@ function connectUI() {
     const toggleShowHands =  i18nElem("toggle-hands")
     const toggleMortalAdvice = i18nElem("toggle-mortal-advice")
     const toggleDealinRateElem = i18nElem("toggle-dealin-rate")
+    const toggleErrorThresholdElem = i18nElem("toggle-error-threshold")
     const about =  i18nElem("about")
     const aboutBody = [document.getElementById("about-body-0"), document.getElementById("about-body-1")]
     const langLabel = i18nElem("langLabel")
@@ -1772,6 +1798,9 @@ function connectUI() {
     toggleDealinRateElem.addEventListener("click", () => {
         toggleDealinRate()
     })
+    toggleErrorThresholdElem.addEventListener("click", () => {
+        toggleErrorThreshold()
+    })
     about.addEventListener("click", () => {
         showModalAndWait(aboutModal)
     })
@@ -1807,10 +1836,14 @@ function connectUI() {
     })
     document.addEventListener('keydown', function(event) {
         // If any modal is open, close the modal instead of doing anything else
+        // But only on "normal" keys
+        //   to avoid closing on e.g. shift or print screen for people doing screenshot hotkeys
+        if (/^[a-z0-9]$/i.test(event.key) || ["Escape", " ", "Enter", "Backspace"].includes(event.key)) {
         for (let thisModal of allModals) {
             if (thisModal.open) {
                 thisModal.close()
                 return
+                }
             }
         }
         if (event.key == 'h') {
@@ -1861,6 +1894,8 @@ function connectUI() {
             updateState()
         } else if (event.key == 'd') {
             toggleDealinRate()
+        } else if (event.key == 'e') {
+            toggleErrorThreshold()
         } else if (event.key == 'a') {
             if (GS.showDealinRate) {
                 showDangerTable()
@@ -2006,7 +2041,15 @@ function normalizeMortalEvals(data) {
     for (let kyoku of data.review.kyokus) {
         for (let mortalEval of kyoku.entries) {
             let probs = mortalEval.details.map(x => x.prob)
-            let normProbs = normalizeAndSoften(probs)
+            // Use soft versions for the bars so that tiny probs are a little more visible
+            // It's just visual so black magic is Ok here.
+            let softNormProbs = normalizeAndSoften(probs, GS.C_soft_T)
+            // Use normal version for calculating the actual error size
+            // So that this metric is not black magic.
+            let normProbs = normalizeAndSoften(probs, 1)
+            mortalEval.details = mortalEval.details.map((obj, idx) => {
+                return { ...obj, softNormProb: softNormProbs[idx]}
+            })
             mortalEval.details = mortalEval.details.map((obj, idx) => {
                 return { ...obj, normProb: normProbs[idx]}
             })
@@ -2025,10 +2068,10 @@ function setMortalJsonStr(data) {
     GS.ui.updateAbout()
 }
 
-// Soften using temperature GS.C_soft_T
+// Soften using temperature T
 // Then normalize so the highest entry is set to 1, others scaled relative to the highest
-function normalizeAndSoften(pdfs) {
-    const hotter = pdfs.map(x => Math.pow(x, 1/GS.C_soft_T))
+function normalizeAndSoften(pdfs, T) {
+    const hotter = pdfs.map(x => Math.pow(x, 1/T))
     const denom = Math.max(...hotter)
     return hotter.map(x => x/denom)
 }
@@ -2119,6 +2162,7 @@ export default { main, GS, debugState } // So we can access these from dev conso
 function main() {
     const lang = ("lang" in localStorage) ? localStorage.getItem("lang") : "en"
     GS.showDealinRate = ("showDealinRate" in localStorage) ? localStorage.getItem("showDealinRate") : false
+    GS.errorThreshold = ("errorThreshold" in localStorage) ? localStorage.getItem("errorThreshold") : 1
     i18next_data.lng = lang
     i18next.init(i18next_data).then(parseUrl(true))
 }
